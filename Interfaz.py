@@ -35,6 +35,12 @@ class FaceRecognitionApp:
         self.recognize_button.bind("<Enter>", lambda event: self.recognize_button.config(bg="#1C1832", fg="white"))
         self.recognize_button.bind("<Leave>", lambda event: self.recognize_button.config(bg="#F2F2F2", fg="black"))
 
+        self.recognize2_button = tk.Button(root, text="Reconocer objetos", command=self.recognize_face, width=20, height=2, font=("Arial", 12), 
+                                        bg="#FEECD9", fg="black", relief="flat", borderwidth=0)
+        self.recognize2_button.pack(pady=10)
+        self.recognize2_button.bind("<Enter>", lambda event: self.recognize2_button.config(bg="#1C1832", fg="white"))
+        self.recognize2_button.bind("<Leave>", lambda event: self.recognize2_button.config(bg="#FEECD9", fg="black"))
+
     def register_face(self):
         self.root.withdraw() 
         top = tk.Toplevel()  # Crea una nueva ventana
@@ -87,7 +93,6 @@ class FaceRecognitionApp:
             self.root.deiconify()  # Muestra la ventana principal nuevamente
 
         top.protocol("WM_DELETE_WINDOW", close_register_window) 
-    
 
     def register_face_camera(self, person_name,video_path=None):
         if person_name:
@@ -108,6 +113,7 @@ class FaceRecognitionApp:
         else:
             face()
 
+    
 if __name__ == "__main__":
     root = tk.Tk()
     app = FaceRecognitionApp(root)
