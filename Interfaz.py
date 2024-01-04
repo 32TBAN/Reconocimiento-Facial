@@ -4,6 +4,7 @@ from tkinter import filedialog
 import subprocess
 from GuardarRostro import save_face_images
 from index import face
+from DetectarObjeto import cap_object
 
 class FaceRecognitionApp:
     def __init__(self, root):
@@ -113,7 +114,13 @@ class FaceRecognitionApp:
         else:
             face()
 
-    
+    def recognize_object(self):
+        file_path = filedialog.askopenfilename()  
+        if file_path:
+            cap_object(file_path)
+        else:
+            cap_object()
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = FaceRecognitionApp(root)
