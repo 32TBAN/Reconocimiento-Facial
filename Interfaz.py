@@ -36,7 +36,7 @@ class FaceRecognitionApp:
         self.recognize_button.bind("<Enter>", lambda event: self.recognize_button.config(bg="#1C1832", fg="white"))
         self.recognize_button.bind("<Leave>", lambda event: self.recognize_button.config(bg="#F2F2F2", fg="black"))
 
-        self.recognize2_button = tk.Button(root, text="Reconocer objetos", command=self.recognize_face, width=20, height=2, font=("Arial", 12), 
+        self.recognize2_button = tk.Button(root, text="Reconocer objetos", command=self.recognize_object, width=20, height=2, font=("Arial", 12), 
                                         bg="#FEECD9", fg="black", relief="flat", borderwidth=0)
         self.recognize2_button.pack(pady=10)
         self.recognize2_button.bind("<Enter>", lambda event: self.recognize2_button.config(bg="#1C1832", fg="white"))
