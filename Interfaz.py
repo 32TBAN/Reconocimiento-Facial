@@ -1,128 +1,107 @@
 import tkinter as tk
-from tkinter import messagebox
-from tkinter import filedialog
+from tkinter import messagebox, filedialog, ttk
 import subprocess
 from GuardarRostro import save_face_images
 from index import face
 from DetectarObjeto import cap_object
 
+
 class FaceRecognitionApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Reconocimiento Facial")
+        self.root.title("Sistema de Reconocimiento")
+        self.root.configure(bg="#F4F6F7")
+        self.root.geometry("500x450")
 
-        self.root.configure(bg="#CBE1CC") 
+        title = tk.Label(
+            root,
+            text="Sistema de Reconocimiento",
+            font=("Arial", 18, "bold"),
+            bg="#F4F6F7",
+            fg="#1C1832"
+        )
+        title.pack(pady=20)
 
-        window_width = 400
-        window_height = 400
-        screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
-        x = (screen_width // 2) - (window_width // 2)
-        y = (screen_height // 2) - (window_height // 2)
-        self.root.geometry(f"{window_width}x{window_height}+{x}+{y}")
+        main_frame = tk.Frame(root, bg="#F4F6F7")
+        main_frame.pack(pady=10)
 
-        self.label = tk.Label(root, text="Seleccione una opción:", font=("Arial", 14),bg="#CBE1CC")
-        self.label.pack(pady=20)
+        self.create_button(main_frame, "📷 Registrar rostro", self.register_face, "#A3E4D7").pack(pady=10)
+        self.create_button(main_frame, "🙂 Reconocer rostro", self.recognize_face, "#AED6F1").pack(pady=10)
+        self.create_button(main_frame, "🎯 Reconocer objetos", self.recognize_object, "#F9E79F").pack(pady=10)
 
-        self.register_button = tk.Button(root, text="Registrar rostro", command=self.register_face, width=20, height=2, font=("Arial", 12),
-                                        bg="#FEECD9", fg="black", relief="flat", borderwidth=0)
-        self.register_button.pack(pady=10)
-        self.register_button.bind("<Enter>", lambda event: self.register_button.config(bg="#1C1832", fg="white"))
-        self.register_button.bind("<Leave>", lambda event: self.register_button.config(bg="#FEECD9", fg="black"))
+        self.status = tk.Label(root, text="Listo", anchor="w", bg="#D5DBDB", fg="black")
+        self.status.pack(fill="x", side="bottom")
 
-        self.recognize_button = tk.Button(root, text="Reconocer rostro", command=self.recognize_face, width=20, height=2, font=("Arial", 12), 
-                                        bg="#F2F2F2", fg="black", relief="flat", borderwidth=0)
-        self.recognize_button.pack(pady=10)
-        self.recognize_button.bind("<Enter>", lambda event: self.recognize_button.config(bg="#1C1832", fg="white"))
-        self.recognize_button.bind("<Leave>", lambda event: self.recognize_button.config(bg="#F2F2F2", fg="black"))
+    def create_button(self, parent, text, command, color):
 
-        self.recognize2_button = tk.Button(root, text="Reconocer objetos", command=self.recognize_object, width=20, height=2, font=("Arial", 12), 
-                                        bg="#FEECD9", fg="black", relief="flat", borderwidth=0)
-        self.recognize2_button.pack(pady=10)
-        self.recognize2_button.bind("<Enter>", lambda event: self.recognize2_button.config(bg="#1C1832", fg="white"))
-        self.recognize2_button.bind("<Leave>", lambda event: self.recognize2_button.config(bg="#FEECD9", fg="black"))
+        btn = tk.Button(
+            parent,
+            text=text,
+            command=command,
+            font=("Arial", 12, "bold"),
+            width=22,
+            height=2,
+            bg=color,
+            fg="black",
+            relief="flat"
+        )
+        btn.bind("<Enter>", lambda e: btn.config(bg="#1C1832", fg="white"))
+        btn.bind("<Leave>", lambda e: btn.config(bg=color, fg="black"))
+        return btn
 
     def register_face(self):
-        self.root.withdraw() 
-        top = tk.Toplevel()  # Crea una nueva ventana
-        top.title("Opciones de Registro")
-        top.geometry("400x400")
-        top.configure(bg="#CBE1CC") 
+        self.status.config(text="Abriendo registro de rostro...")
+        top = tk.Toplevel(self.root)
+        top.title("Registrar Rostro")
+        top.geometry("400x350")
+        top.configure(bg="#F4F6F7")
 
-        window_width = 400
-        window_height = 400
-        screen_width = top.winfo_screenwidth()
-        screen_height = top.winfo_screenheight()
-        x = (screen_width // 2) - (window_width // 2)
-        y = (screen_height // 2) - (window_height // 2)
-        top.geometry(f"{window_width}x{window_height}+{x}+{y}")
-
-        label = tk.Label(top, text="Ingrese su nombre:", font=("Arial", 14),bg="#CBE1CC")
-        label.pack(pady=10)
-
+        tk.Label(top, text="Nombre:", font=("Arial", 12), bg="#F4F6F7").pack(pady=5)
         name_entry = tk.Entry(top, font=("Arial", 12))
         name_entry.pack(pady=5)
 
-        register_button = tk.Button(top, text="Camara", command=lambda: self.register_face_camera(name_entry.get()), width=20, height=2,
-                                    font=("Arial", 12),bg="#E3EDF9", fg="black", relief="flat", borderwidth=0)
-        register_button.pack(pady=10)
-        register_button.bind("<Enter>", lambda event: register_button.config(bg="#1C1832", fg="white"))
-        register_button.bind("<Leave>", lambda event: register_button.config(bg="#E3EDF9", fg="black"))
-
-        def select_file():
-            file_path = filedialog.askopenfilename() 
-            video_entry.delete(0, tk.END) 
-            video_entry.insert(tk.END, file_path) 
-
-        browse_button = tk.Button(top, text="Seleccionar Video", command=select_file, width=20, height=2, font=("Arial", 12),
-                                bg="#FFFFFF", fg="black", relief="flat", borderwidth=0)
-        browse_button.pack(pady=10)
-        browse_button.bind("<Enter>", lambda event: browse_button.config(bg="#1C1832", fg="white"))
-        browse_button.bind("<Leave>", lambda event: browse_button.config(bg="#FFFFFF", fg="black"))
-
+        tk.Label(top, text="(Opcional) Seleccionar video:", font=("Arial", 12), bg="#F4F6F7").pack(pady=5)
         video_entry = tk.Entry(top, font=("Arial", 12))
         video_entry.pack(pady=5)
 
-        register_button_video = tk.Button(top, text="Registrar", command=lambda: self.register_face_camera(name_entry.get(),video_entry.get()), 
-                                        width=20, height=2, font=("Arial", 12),bg="#FEECD9", fg="black", relief="flat", borderwidth=0)
-        register_button_video.pack(pady=10)
-        register_button_video.bind("<Enter>", lambda event: register_button_video.config(bg="#1C1832", fg="white"))
-        register_button_video.bind("<Leave>", lambda event: register_button_video.config(bg="#FEECD9", fg="black"))
+        tk.Button(top, text="Examinar", command=lambda: self.select_file(video_entry)).pack(pady=5)
 
-        def close_register_window():
-            top.destroy()  # Cierra la ventana de registro
-            self.root.deiconify()  # Muestra la ventana principal nuevamente
+        tk.Button(top, text="Registrar", bg="#A3E4D7",
+                  command=lambda: self.register_face_camera(name_entry.get(), video_entry.get())).pack(pady=15)
 
-        top.protocol("WM_DELETE_WINDOW", close_register_window) 
+    def select_file(self, entry):
+        file_path = filedialog.askopenfilename()
+        if file_path:
+            entry.delete(0, tk.END)
+            entry.insert(tk.END, file_path)
 
-    def register_face_camera(self, person_name,video_path=None):
+    def register_face_camera(self, person_name, video_path=None):
         if person_name:
             if video_path:
                 save_face_images(person_name, video_path)
             else:
                 save_face_images(person_name)
-            messagebox.showinfo("Registrar rostro", f"Se ha registrado el rostro de {person_name}")
-            script_path = 'Entrenar.py'
-            subprocess.call(['python', script_path])
+            messagebox.showinfo("Registro", f"Se registró el rostro de {person_name}")
+            self.status.config(text="Entrenando modelo...")
+            subprocess.call(['python', 'Entrenar.py'])
+            self.status.config(text="Modelo entrenado con éxito")
         else:
-            messagebox.showwarning("Registrar rostro", "Ingrese un nombre válido")
+            messagebox.showwarning("Registro", "Ingrese un nombre válido")
 
     def recognize_face(self):
-        file_path = filedialog.askopenfilename()  
-        if file_path:
-            face(file_path)
-        else:
-            face()
+        self.status.config(text="Reconociendo rostro...  (q para salir)")
+        file_path = filedialog.askopenfilename()
+        face(file_path if file_path else None)
+        self.status.config(text="Listo")
 
     def recognize_object(self):
-        file_path = filedialog.askopenfilename()  
-        if file_path:
-            cap_object(file_path)
-        else:
-            cap_object()
+        self.status.config(text="Reconociendo objetos... (q para salir)")
+        file_path = filedialog.askopenfilename()
+        cap_object(file_path if file_path else None)
+        self.status.config(text="Listo")
+
 
 if __name__ == "__main__":
     root = tk.Tk()
     app = FaceRecognitionApp(root)
-    root.geometry("400x400") 
     root.mainloop()
